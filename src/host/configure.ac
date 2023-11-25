@@ -1,5 +1,6 @@
-AC_INIT(common/msglog.c)
-AC_CONFIG_HEADER(config.h)
+AC_INIT
+AC_CONFIG_SRCDIR([common/msglog.c])
+AC_CONFIG_HEADERS([config.h])
 
 AC_CHECK_TOOL(AR, ar)
 AC_PROG_CC
@@ -12,5 +13,6 @@ AC_CHECK_DECLS([__builtin_bswap32,bswap_32],,,[[
 ]])
 AC_CHECK_FUNCS(pread stat)
 
-AC_OUTPUT(Makefile common/Makefile network/Makefile server/Makefile
-          datasource/Makefile cmdline/Makefile)
+AC_CONFIG_FILES([Makefile common/Makefile network/Makefile server/Makefile
+          datasource/Makefile cmdline/Makefile])
+AC_OUTPUT
