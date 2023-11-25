@@ -2,3 +2,5 @@
 autom4te.cache/
 configure
 config.h.in
+src/host/cmdline/dc-virtcd-cmdline
+src/host/config.h
