@@ -21,7 +21,7 @@ virtcd.elf : $(OBJS)
 	$(CC) -o $@ -Wl,--oformat,elf32-shl,-Ttext=$(BASEADDR) -nostartfiles -nostdlib $(OBJS) $(LIBS) -lgcc
 
 sc.o : $(top_builddir)/skel/sub.bin
-	$(srcdir)/bin2obj.pike -o $@ _subcode $^
+	$(KOS_BASE)/utils/bin2o/bin2o $^ subcode $@
 
 clean :
 	-rm -f virtcd.elf $(OBJS)
