@@ -6,4 +6,5 @@
 *.elf
 config.status
 Makefile
-
+dc-virtcd-cmdline
+host/config.h
