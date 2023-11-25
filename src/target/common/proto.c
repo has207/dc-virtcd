@@ -1,8 +1,8 @@
 #include "proto.h"
 #include "util.h"
 
-static int target_ip=-1;
-static unsigned char target_hw[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+static int host_ip=-1;
+static unsigned char host_mac[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 static int server_detected=0;
 
 static int seq_id = 1001;
@@ -22,13 +22,13 @@ static int pkt_size[NUM_SLOTS];
 
 int get_server_ip(unsigned int *addr)
 {
-  *addr = target_ip;
+  *addr = host_ip;
   return server_detected;
 }
 
 int get_server_mac(unsigned char *mac)
 {
-  memcpy(mac, target_hw, 6);
+  memcpy(mac, host_mac, 6);
   return server_detected;
 }
 
@@ -83,8 +83,8 @@ static void handle_extra(unsigned char *src, int sz, void *ret)
 
 void set_server(void *ip, void *mac)
 {
-  memcpy(&target_ip, ip, 4);
-  memcpy(target_hw, mac, 6);
+  memcpy(&host_ip, ip, 4);
+  memcpy(host_mac, mac, 6);
 }
 
 void proto_got_packet(void *pkt, int sz, void *ip_pkt)
@@ -104,7 +104,7 @@ void proto_got_packet(void *pkt, int sz, void *ip_pkt)
     slots[n][2] = (slots[n][2] & 0xffff) | phase;
     resend_time[n] = RESEND_TIME;
     resend_count[n] = RESEND_COUNT;
-    udp_send_packet(target_hw, target_ip, CLIENT_PORT, SERVER_PORT,
+    udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
 		    slots[n], pkt_size[n]);  
     num_commands ++;
   } else {
@@ -123,7 +123,7 @@ void background_process()
   for(i=0; i<NUM_SLOTS; i++)
     if(slots[i][0]>0 && --resend_time[i]<0) {
       if(--resend_count[i]) {
-	udp_send_packet(target_hw, target_ip, CLIENT_PORT, SERVER_PORT,
+	udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
 			slots[i], pkt_size[i]);
 	resend_time[i] = RESEND_TIME * (RESEND_COUNT - resend_count[i]);
 	num_resends++;
@@ -178,7 +178,7 @@ int send_command_packet(int cmd, void *param, int pcnt)
     memcpy(pkt+3, param, pcnt*sizeof(int));
   resend_time[n] = RESEND_TIME;
   resend_count[n] = RESEND_COUNT;
-  udp_send_packet(target_hw, target_ip, CLIENT_PORT, SERVER_PORT,
+  udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
 		  pkt, (pkt_size[n]=(pcnt+3)*sizeof(int)));  
   num_commands++;
   if(seq_id < 0)
