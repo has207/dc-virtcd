@@ -1,4 +1,5 @@
-AC_INIT(launcher/main.c)
+AC_INIT
+AC_CONFIG_SRCDIR([launcher/main.c])
 
 DCAS='sh-elf-as -little'
 DCLD='sh-elf-ld -EL'
@@ -13,4 +14,5 @@ AC_SUBST(DCAR)
 AC_SUBST(DCOBJCOPY)
 AC_SUBST(DCCFLAGS)
 
-AC_OUTPUT(Makefile common/Makefile network/Makefile skel/Makefile launcher/Makefile)
+AC_CONFIG_FILES([Makefile common/Makefile network/Makefile skel/Makefile launcher/Makefile])
+AC_OUTPUT
