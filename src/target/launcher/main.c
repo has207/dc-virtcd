@@ -8,7 +8,7 @@
 
 #define SUBSTART 0x8c008300
 
-static int download_addr, download_size;
+static int download_start, download_addr, download_size;
 
 void debug_dump(unsigned char *data, int sz)
 {
