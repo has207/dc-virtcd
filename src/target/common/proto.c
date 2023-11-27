@@ -2,7 +2,6 @@
 #include "util.h"
 
 static int host_ip=-1;
-static unsigned char host_mac[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 static int server_detected=0;
 
 static int seq_id = 1001;

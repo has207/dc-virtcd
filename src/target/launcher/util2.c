@@ -6,13 +6,6 @@
 /* Dummy stub to make libgcc happy... */
 void atexit() { }
 
-extern int syscall_read_flash(int offs, void *ptr, int cnt);
-
-int syscall_info_flash(int sect, int *info)
-{
-  return (*(int (**)())0x8c0000b8)(sect,info,0,0);  
-}
-
 unsigned short flash_crc(char *buf, int cnt)
 {
   static unsigned short table[] = {
@@ -53,43 +46,6 @@ unsigned short flash_crc(char *buf, int cnt)
   while(cnt--)
     tmp = (tmp<<8)^table[(tmp>>8)^(unsigned char)*buf++];
   return ~tmp;
-}
-
-int flash_read_sector(int partition, int sec, char *dst)
-{
-  int s, r, n, b, bmb, got=0;
-  int info[2];
-  static char buf[64];
-  static char bm[64];
-
-  if((r = syscall_info_flash(partition, info))<0)
-    return r;
-
-  if((r = syscall_read_flash(info[0], buf, 64))<0)
-    return r;
-
-  if(memcmp(buf, "KATANA_FLASH", 12) ||
-     buf[16] != partition || buf[17] != 0)
-    return -2;
-
-  n = (info[1]>>6)-1-((info[1] + 0x7fff)>>15);
-  bmb = n+1;
-  for(b = 0; b < n; b++) {
-    if(!(b&511)) {
-      if((r = syscall_read_flash(info[0] + (bmb++ << 6), bm, 64))<0)
-	return r;
-    }
-    if(!(bm[(b>>3)&63] & (0x80>>(b&7))))
-      if((r = syscall_read_flash(info[0] + ((b+1) << 6), buf, 64))<0)
-	return r;
-      else if((s=*(unsigned short *)(buf+0)) == sec &&
-	      flash_crc(buf, 62) == *(unsigned short *)(buf+62)) {
-	memcpy(dst+(s-sec)*60, buf+2, 60);
-	got=1;
-      }
-  }
-
-  return got;
 }
 
 static int do_plot_string(int x, int y, char *p, unsigned short col)

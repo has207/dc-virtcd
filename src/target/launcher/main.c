@@ -60,51 +60,35 @@ void setup_network()
   printf("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
 	 ether_MAC[0], ether_MAC[1], ether_MAC[2], 
 	 ether_MAC[3], ether_MAC[4], ether_MAC[5]);
-  printf("Checking for flash settings...");
-  if(flash_read_sector(2,224,(char*)sec)==1 &&
-     sec[0]=='S' && sec[1]=='E' && sec[2]=='G' && sec[3]=='A') {
-    /* Broadband Passport settings */
-    ip_set_my_ip((unsigned int *)(sec+8));
-    printf("Broadband Passport\n");
-  } else if(flash_read_sector(2,96,(char*)sec)==1 &&
-	    sec[0]=='S' && sec[1]=='E' && sec[2]=='G' && sec[3]=='A') {
-    /* Quake III Arena settings */
-    ip_set_my_ip((unsigned int *)(sec+8));
-    printf("Quake III Arena\n");
-  } else
-    printf("None\n");
+  unsigned char my_ip[4] = { 10, 0, 1, 64 };
+  ip_set_my_ip(my_ip);
+
   printf("My IP address: ");
   if(ip_get_my_ip(&ip_no.i))
     printf("%d.%d.%d.%d\n",
 	   ip_no.b[0], ip_no.b[1], ip_no.b[2], ip_no.b[3]);
   else
     printf("Unknown\n");
-  printf("Broadcasting for server...");
-  if(wait_command_packet(send_command_packet(999, 0L, 0))<0 ||
-     !get_server_ip(&ip_no.i)) {
-    printf("FAILED!");
-    halt();
-  }
-  printf("%d.%d.%d.%d\n",
-	 ip_no.b[0], ip_no.b[1], ip_no.b[2], ip_no.b[3]);
-  
+  unsigned char ip[4] = { 10, 0, 1, 73 };
+  set_server(ip, host_mac);
 }
 
-void select_binary(int n)
+int select_binary(int n)
 {
   int c, sz;
   printf("Requesting binary...");
   sz = wait_command_packet(send_command_packet(998, &n, 1));
   if(sz < 0 || sz > MAX_BINARY) {
     printf("FAILED!");
-    halt();
+    return -1;
   }
   printf("%d bytes\n", sz);
-  download_addr = 0x8c008000;
+  download_start = download_addr = 0x8c008000;
   download_size = sz+0x8000;
+  return 0;
 }
 
-void download()
+int download()
 {
   int tot = download_size;
   int tmp, cur = 10;
@@ -125,15 +109,15 @@ void download()
 	if(c[i]>=0)
 	  if(wait_command_packet(c[i])<0) {
 	    printf("  FAILED!");
-	    halt();
+	    return -1;
 	  }
       printf("  Done\n");
-      return;
+      break;
     }
     if(c[i]>=0)
       if(wait_command_packet(c[i])<0) {
 	printf("  FAILED!");
-	halt();
+	return -1;
       }
     tmp = download_size;
     if(tmp > 1024)
@@ -146,6 +130,7 @@ void download()
     if(++i >= 8)
       i = 0;
   }
+  return 0;
 }
 
 void run()
@@ -163,16 +148,19 @@ void run()
   memcpy((void*)SUBSTART, subcode, subcode_end - subcode);
   ((void (*)(unsigned int, unsigned int, void *))(void*)(SUBSTART+4))
     (my_ip, server_ip, server_mac);
-  launch(0x8c010000);
+  //launch(0x8c010000);
+  launch(download_start + 0x00008000);
   printf("Execution terminated.");
 }
 
 void main()
 {
+  //struct smb2_context *smb2;
+  //smb2 = smb2_init_context();
+  //cdrom_spin_down();
   setup_video();
   setup_network();
-  select_binary(0);
-  download();
+  if (select_binary(0) < 0) return;
+  if (download() < 0) return;
   run();
-  halt();
 }

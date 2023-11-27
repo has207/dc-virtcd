@@ -9,6 +9,8 @@ extern void background_process(void);
 extern void idle(void);
 extern int *get_packet_slot(int n);
 
+static unsigned char host_mac[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+
 #define CLIENT_PORT 4781
 #define SERVER_PORT 4782
 
