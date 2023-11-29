@@ -12,7 +12,7 @@ VPATH=@srcdir@
 
 SUBBASEADDR=0x8c005000
 
-OBJS = sub.o schandler.o
+OBJS = sub.o handler.o
 LIBS = $(top_builddir)/network/libnetwork.a $(top_builddir)/common/libcommon.a
 
 all : sub.bin
@@ -28,5 +28,5 @@ clean :
 
 sub.o : sub.s
 
-schandler.o : schandler.c $(top_srcdir)/network/pci.h $(top_srcdir)/network/ether.h $(top_srcdir)/common/proto.h $(top_srcdir)/common/util.h
+handler.o : handler.c $(top_srcdir)/network/pci.h $(top_srcdir)/network/ether.h $(top_srcdir)/common/proto.h $(top_srcdir)/common/util.h
 

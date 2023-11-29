@@ -17,7 +17,7 @@ This is where we generate the code the replaces gdrom* syscalls and
 contains all necessary subroutines for networking to continue working
 after our initial executable is replaced by the game.
 
-At a high level, schandler.c (subcode handler) defines the C routines
+At a high level, handler.c defines the C routines
 that do the communication with the server that hosts the game
 and sub.s contains the assembler needed for initial handler installation
 and jump table for gdrom* routines.
