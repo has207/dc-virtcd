@@ -76,7 +76,7 @@ void setup_network()
   else
     printf("Unknown\n");
   unsigned char ip[4] = PC_IP;
-  set_server(ip, host_mac);
+  set_server(ip);
 }
 
 int get_bin_size()
@@ -150,15 +150,13 @@ int install_patch(int patch_location)
 
 int setup_handler(int patch_location)
 {
-  unsigned char server_mac[6];
   unsigned int my_ip, server_ip;
 
-  get_server_mac(server_mac);
   get_server_ip(&server_ip);
   ip_get_my_ip(&my_ip);
 
-  ((void (*)(unsigned int, unsigned int, void *))(void*)(patch_location))
-    (my_ip, server_ip, server_mac);
+  ((void (*)(unsigned int, unsigned int))(void*)(patch_location))
+    (my_ip, server_ip);
 
 }
 
@@ -189,7 +187,6 @@ void main()
 
   //ether_teardown();
   // Start in ip.bin
-  halt();
   launch(0x8c00B800);
   // Start in 1st_read.bin
   //launch(0x8c010000);

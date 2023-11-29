@@ -25,12 +25,6 @@ int get_server_ip(unsigned int *addr)
   return server_detected;
 }
 
-int get_server_mac(unsigned char *mac)
-{
-  memcpy(mac, host_mac, 6);
-  return server_detected;
-}
-
 static char *extra_addr;
 
 static void handle_extra(unsigned char *src, int sz, void *ret)
@@ -80,10 +74,9 @@ static void handle_extra(unsigned char *src, int sz, void *ret)
     }
 }
 
-void set_server(void *ip, void *mac)
+void set_server(void *ip)
 {
   memcpy(&host_ip, ip, 4);
-  memcpy(host_mac, mac, 6);
 }
 
 void proto_got_packet(void *pkt, int sz, void *ip_pkt)
@@ -96,14 +89,14 @@ void proto_got_packet(void *pkt, int sz, void *ip_pkt)
   if(n<0 || n>=NUM_SLOTS || p[0]<=0 || p[0] != slots[n][0])
     return;
   if(!server_detected) {
-    set_server(((unsigned char *)ip_pkt)+12, ((unsigned char *)ip_pkt)-8);
+    set_server(((unsigned char *)ip_pkt)+12);
     server_detected = 1;
   }
   if(p[2]>=0 && (phase=p[2]&~0xffff) && (slots[n][2] & 0xffff)<100) {
     slots[n][2] = (slots[n][2] & 0xffff) | phase;
     resend_time[n] = RESEND_TIME;
     resend_count[n] = RESEND_COUNT;
-    udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
+    udp_send_packet(host_ip, CLIENT_PORT, SERVER_PORT,
 		    slots[n], pkt_size[n]);  
     num_commands ++;
   } else {
@@ -122,7 +115,7 @@ void background_process()
   for(i=0; i<NUM_SLOTS; i++)
     if(slots[i][0]>0 && --resend_time[i]<0) {
       if(--resend_count[i]) {
-	udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
+	udp_send_packet(host_ip, CLIENT_PORT, SERVER_PORT,
 			slots[i], pkt_size[i]);
 	resend_time[i] = RESEND_TIME * (RESEND_COUNT - resend_count[i]);
 	num_resends++;
@@ -177,7 +170,7 @@ int send_command_packet(int cmd, void *param, int pcnt)
     memcpy(pkt+3, param, pcnt*sizeof(int));
   resend_time[n] = RESEND_TIME;
   resend_count[n] = RESEND_COUNT;
-  udp_send_packet(host_mac, host_ip, CLIENT_PORT, SERVER_PORT,
+  udp_send_packet(host_ip, CLIENT_PORT, SERVER_PORT,
 		  pkt, (pkt_size[n]=(pcnt+3)*sizeof(int)));  
   num_commands++;
   if(seq_id < 0)

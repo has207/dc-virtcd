@@ -43,7 +43,7 @@ void udp_got_packet(void *pkt, int size, void *ip_pkt)
   }
 }
 
-void udp_send_packet(void *target_mac, unsigned int target_ip,
+void udp_send_packet(unsigned int target_ip,
 		     unsigned short src_port, unsigned short target_port,
 		     void *pkt, unsigned size)
 {
@@ -58,6 +58,6 @@ void udp_send_packet(void *target_mac, unsigned int target_ip,
   ip_get_my_ip((unsigned int *)&udppkt[14]);
   *(unsigned int *)&udppkt[16] = target_ip;
   udppkt[21] = 0/*udp_calc_checksum(udppkt+18, size, udppkt+8)*/;
-  ip_send_packet(target_mac, udppkt+8);
+  ip_send_packet(udppkt+8);
 }
 

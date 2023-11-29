@@ -91,7 +91,7 @@ void ip_reply_packet(void *pkt)
   ip_low_reply_packet(pkt);
 }
 
-void ip_send_packet(void *target_mac, void *pkt)
+void ip_send_packet(void *pkt)
 {
   unsigned char *p = ((unsigned char *)pkt)-14;
   int sz = htons(((unsigned short *)pkt)[1])+14;
@@ -111,7 +111,7 @@ void ip_send_packet(void *target_mac, void *pkt)
 
   ((unsigned short *)p)[6] = 8;
   for(i=0; i<6; i++) {
-    p[i] = ((unsigned char *)target_mac)[i];
+    p[i] = 0xff; // mac address
     p[i+6] = ether_MAC[i];
   }
   ether_send_packet(((unsigned char *)pkt)-14, sz);
