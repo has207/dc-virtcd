@@ -35,17 +35,17 @@ start:
 	mov.l	r1,@r0
 	bf/s	.loop
 	add	#4,r0
-	! Go to init() which sets up client and server ips.
-	! The indirection with mainaddr is used to work around PC
+	! Go to init_network() which sets up client and server ips.
+	! The indirection is used to work around PC
 	! relative addressing limitations
-	mov.l	mainaddr,r0
+	mov.l	initnetwork,r0
 	jmp	@r0
 	nop
 
 	.align 4
 
-mainaddr:
-	.long _init
+initnetwork:
+	.long _init_network
 	
 
 	.align 4

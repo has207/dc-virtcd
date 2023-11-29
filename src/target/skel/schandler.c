@@ -127,7 +127,7 @@ int unimpl_syscall(int r4, int r5, int r6, int r7)
   return -1;
 }
 
-void init(unsigned int my_ip, unsigned int server_ip)
+void init_network(unsigned int my_ip, unsigned int server_ip)
 {
   ip_set_my_ip(&my_ip);
   set_server(&server_ip);

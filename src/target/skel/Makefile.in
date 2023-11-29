@@ -10,7 +10,7 @@ top_builddir=@top_builddir@
 srcdir=@srcdir@
 VPATH=@srcdir@
 
-SUBBASEADDR=0x8c008300
+SUBBASEADDR=0x8c005000
 
 OBJS = sub.o schandler.o
 LIBS = $(top_builddir)/network/libnetwork.a $(top_builddir)/common/libcommon.a
