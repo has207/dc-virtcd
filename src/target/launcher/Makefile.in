@@ -12,7 +12,7 @@ VPATH=@srcdir@
 
 BASEADDR=0x8cf40000
 
-OBJS = startup.o main.o util2.o video.o launch.o sc.o
+OBJS = startup.o main.o util2.o video.o launch.o handler.o
 LIBS = $(top_builddir)/network/libnetwork.a $(top_builddir)/common/libcommon.a
 
 all : virtcd.elf
@@ -20,7 +20,7 @@ all : virtcd.elf
 virtcd.elf : $(OBJS)
 	$(CC) -o $@ -Wl,--oformat,elf32-shl,-Ttext=$(BASEADDR) -nostartfiles -nostdlib $(OBJS) $(LIBS) -lgcc
 
-sc.o : $(top_builddir)/handler/sub.bin
+handler.o : $(top_builddir)/handler/sub.bin
 	$(KOS_BASE)/utils/bin2o/bin2o $^ subcode $@
 
 clean :
