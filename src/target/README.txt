@@ -11,7 +11,7 @@ to use biggish memory chunk at this stage, as long as it leaves enough
 room to load 1ST_READ.BIN.
 
 
-* skel/
+* handler/
 
 This is where we generate the code the replaces gdrom* syscalls and
 contains all necessary subroutines for networking to continue working
@@ -25,7 +25,7 @@ and jump table for gdrom* routines.
 The code is compiled into an elf executable, which is then stripped down
 to bare machine code using objcopy, which ends up stored in sub.bin.
 The elf is compiled such that its text area starts at a specific memory
-location. This location is hardocoded in skel/Makefile and separately
+location. This location is hardocoded in handler/Makefile and separately
 in launcher/main.c (as SUBSTART). These values can be changed to place
 this code in a different location as long as they are kept in sync.
 

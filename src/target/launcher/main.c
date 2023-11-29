@@ -11,7 +11,7 @@
 #define DOWNLOAD_ADDR 0x8c008000
 #define MAX_BINARY (15*1024*1024)
 
-// Location of syscall patch, must match value in skel/Makefile
+// Location of syscall patch, must match value in handler/Makefile
 #define SUBSTART 0x8c005000
 
 extern char subcode[], subcode_end[];

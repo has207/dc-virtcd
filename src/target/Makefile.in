@@ -11,7 +11,7 @@ VPATH=@srcdir@
 all clean :
 	cd common && make $@
 	cd network && make $@
-	cd skel && make $@
+	cd handler && make $@
 	cd launcher && make $@
 	make local-$@
 
@@ -21,7 +21,7 @@ local-clean :
 
 install :
 
-Makefile common/Makefile network/Makefile skel/Makefile launcher/Makefile: Makefile.in common/Makefile.in network/Makefile.in skel/Makefile.in launcher/Makefile.in config.status
+Makefile common/Makefile network/Makefile handler/Makefile launcher/Makefile: Makefile.in common/Makefile.in network/Makefile.in handler/Makefile.in launcher/Makefile.in config.status
 	./config.status
 
 config.status : configure

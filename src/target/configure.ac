@@ -14,5 +14,5 @@ AC_SUBST(DCAR)
 AC_SUBST(DCOBJCOPY)
 AC_SUBST(DCCFLAGS)
 
-AC_CONFIG_FILES([Makefile common/Makefile network/Makefile skel/Makefile launcher/Makefile])
+AC_CONFIG_FILES([Makefile common/Makefile network/Makefile handler/Makefile launcher/Makefile])
 AC_OUTPUT
