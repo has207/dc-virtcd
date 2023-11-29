@@ -32,23 +32,24 @@ Bulding
 (separately in host/ and target/)
 autoconf && autoupdate && ./configure && make
 
+IMPORTANT: Adjust DREAMCAST_IP and PC_IP in target/launcher/main.c before compiling.
+Original version of this code attempted to use network settings in system flash on
+the Dreamcast and broadcast to find the server. Both endpoints are now specified
+at compile time instead.
 
-Running
--------
-
-First start ./target/launcher/virtcd.elf on the Dreamcast (dcload-ip is fine).
-Quickly thereafter, on PC run ./host/cmdline/dc-virtcd-cmdline /path/to/game.iso
-
-The binary on the Dreamcast will broadcast looking for the PC for a short while
-but will time out if you wait too long.
-
-The two machines must be on the same subnet as the communication is established
-using broadcast packets that won't cross subnet boundaries. This means it will
-not work on Windows using WSL since it creates a virtualized network, and it
+This means the two machines no longer need to be on the same subnet, however the subnet
+of the PC still needs to be routable from the Dreamcast. This means it will
+not work on Windows using WSL since it creates a virtualized network (unless you put
+in additional effort to make it routable somehow), and it
 won't work in a virtual machine unless you use bridged networking to ensure the
 VM gets an IP on the same network as the host.
 
-The Dreamcast will need a network configuration saved to flash as virtcd does
-not support DHCP. XDP is probably the easiest method unless you own the
-Broadband passport since there are easy to find .cdi images for XDP.
+Running
+-------
+On the PC run ./host/cmdline/dc-virtcd-cmdline /path/to/game.iso
+It will wait for connections from DC so you can leave this running.
 
+Next start ./target/launcher/virtcd.elf on the Dreamcast (using dcload-ip is fine).
+
+If host code is running when you load the elf on the DC the  download will start
+and you should load into the game.
