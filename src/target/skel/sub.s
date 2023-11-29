@@ -5,18 +5,12 @@
 
 	.align 2
 
-start:	
+start:
+	! not sure why we need the first two instructions
+	! seems they get skipped over but are needed here
+	! for padding..?
 	rts
 	nop
-	bra enable
-	nop
-	bra disable
-	nop
-	bra reset
-	nop
-
-
-enable:
 	mova	handler,r0
 	mov.l	isysc_vector,r1
 	mov.l	@r1,r2
@@ -41,16 +35,11 @@ enable:
 	mov.l	r1,@r0
 	bf/s	.loop
 	add	#4,r0
+	! Go to init() which sets up client and server ips.
+	! The indirection with mainaddr is used to work around PC
+	! relative addressing limitations
 	mov.l	mainaddr,r0
 	jmp	@r0
-	nop
-
-disable:
-	rts
-	nop
-
-reset:
-	rts
 	nop
 
 	.align 4
