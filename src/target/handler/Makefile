@@ -1,14 +1,14 @@
-AS = @DCAS@
-LD = @DCLD@
-CC = @DCCC@
-AR = @DCAR@
-OBJCOPY = @DCOBJCOPY@
-CFLAGS = @DCCFLAGS@ -I$(top_srcdir)/common -I$(top_srcdir)/network
+AS = sh-elf-as -little
+LD = sh-elf-ld -EL
+CC = sh-elf-gcc -ml -m4-single-only
+AR = sh-elf-ar
+OBJCOPY = sh-elf-objcopy
+CFLAGS = -Os -I$(top_srcdir)/common -I$(top_srcdir)/network
 
-top_srcdir=@top_srcdir@
-top_builddir=@top_builddir@
-srcdir=@srcdir@
-VPATH=@srcdir@
+top_srcdir=..
+top_builddir=..
+srcdir=.
+
 
 SUBBASEADDR=0x8c005000
 

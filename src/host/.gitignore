@@ -1,0 +1,8 @@
+*.o
+*.a
+*~
+*.log
+config.status
+Makefile
+dc-virtcd-cmdline
+config.h

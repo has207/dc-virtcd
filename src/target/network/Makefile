@@ -1,12 +1,10 @@
-AS = @DCAS@
-LD = @DCLD@
-CC = @DCCC@
-AR = @DCAR@
-CFLAGS = @DCCFLAGS@ -I$(top_srcdir)/common
+AS = sh-elf-as -little
+LD = sh-elf-ld -EL
+CC = sh-elf-gcc -ml -m4-single-only
+AR = sh-elf-ar
+CFLAGS = -Os -I$(top_srcdir)/common
 
-top_srcdir=@top_srcdir@
-srcdir=@srcdir@
-VPATH=@srcdir@
+top_srcdir=..
 
 OBJS = pci.o ether.o arp.o ip.o icmp.o udp.o
 

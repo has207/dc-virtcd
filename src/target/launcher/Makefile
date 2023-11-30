@@ -1,14 +1,13 @@
-AS = @DCAS@
-LD = @DCLD@
-CC = @DCCC@
-AR = @DCAR@
-OBJCOPY = @DCOBJCOPY@
-CFLAGS = @DCCFLAGS@ -I$(top_srcdir)/common -I$(top_srcdir)/network
+AS = sh-elf-as -little
+LD = sh-elf-ld -EL
+CC = sh-elf-gcc -ml -m4-single-only
+AR = sh-elf-ar
+OBJCOPY = sh-elf-objcopy
+CFLAGS = -Os -I$(top_srcdir)/common -I$(top_srcdir)/network
 
-top_srcdir=@top_srcdir@
-top_builddir=@top_builddir@
-srcdir=@srcdir@
-VPATH=@srcdir@
+top_srcdir=..
+top_builddir=..
+
 
 BASEADDR=0x8cf40000
 
@@ -19,9 +18,11 @@ all : virtcd.elf
 
 virtcd.elf : $(OBJS)
 	$(CC) -o $@ -Wl,--oformat,elf32-shl,-Ttext=$(BASEADDR) -nostartfiles -nostdlib $(OBJS) $(LIBS) -lgcc
+	kos-strip --strip-debug virtcd.elf
 
 handler.o : $(top_builddir)/handler/sub.bin
 	$(KOS_BASE)/utils/bin2o/bin2o $^ subcode $@
+	kos-strip --strip-debug handler.o
 
 clean :
 	-rm -f virtcd.elf $(OBJS)
@@ -34,5 +35,4 @@ startup.o : startup.s
 
 launch.o : launch.s
 
-util2.o : util2.c $(top_srcdir)/common/util.h video.h
-
+util2.o : util2.c util2.h $(top_srcdir)/common/util.h video.h

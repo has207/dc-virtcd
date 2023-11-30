@@ -1,10 +1,6 @@
 *.o
 *.a
-*~
-*.log
-*.bin
-*.elf
-config.status
-Makefile
-dc-virtcd-cmdline
-host/config.h
+/*~
+/*.log
+/config.status
+/Makefile

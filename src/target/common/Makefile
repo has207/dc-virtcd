@@ -1,12 +1,8 @@
-AS = @DCAS@
-LD = @DCLD@
-CC = @DCCC@
-AR = @DCAR@
-CFLAGS = @DCCFLAGS@
-
-top_srcdir=@top_srcdir@
-srcdir=@srcdir@
-VPATH=@srcdir@
+AS = sh-elf-as -little
+LD = sh-elf-ld -EL
+CC = sh-elf-gcc -ml -m4-single-only
+AR = sh-elf-ar
+CFLAGS = -Os
 
 OBJS = proto.o util1.o
 
