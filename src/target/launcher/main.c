@@ -4,7 +4,7 @@
 #include "ether.h"
 #include "proto.h"
 #include "util.h"
-#include "cdfs.h"
+#include "cdfs/cdfs.h"
 
 #define DREAMCAST_IP { 10, 0, 1, 64 }
 #define PC_IP { 10, 0, 1, 73 }

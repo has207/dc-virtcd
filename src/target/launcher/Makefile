@@ -11,7 +11,7 @@ top_builddir=..
 
 BASEADDR=0x8cf40000
 
-OBJS = startup.o main.o util2.o video.o launch.o handler.o cdfs.o syscall.o
+OBJS = startup.o main.o util2.o video.o launch.o handler.o cdfs/cdfs.o cdfs/syscall.o
 LIBS = $(top_builddir)/network/libnetwork.a $(top_builddir)/common/libcommon.a
 
 all : virtcd.elf
@@ -36,9 +36,3 @@ startup.o : startup.s
 launch.o : launch.s
 
 util2.o : util2.c $(top_srcdir)/common/util.h video.h
-
-syscall.o : syscall.s
-
-cdfs.o : cdfs.c cdfs.h
-
-
