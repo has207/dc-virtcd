@@ -125,15 +125,6 @@ void main()
   setup_video();
   setup_network();
 
-  // which iso to load from the server
-  // default to 0 to take the first one
-  int disc_id = 0;
-  int sz;
-  sz = wait_command_packet(send_command_packet(998, &disc_id, 1));
-  if(sz < IPBIN_SIZE || sz > MAX_BINARY) {
-    printf("FAILED!");
-  }
-
   printf("Patching syscalls at %x with %d bytes\n", SUBSTART, subcode_end - subcode);
   install_patch(SUBSTART);
 

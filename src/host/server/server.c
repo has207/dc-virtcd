@@ -68,6 +68,7 @@ static int32_t gderror(server s, struct extra_response *extra, int32_t e)
 		    0, 0, 0, 0,
 		    0, 0, 0, 0,
 		    0, 0, 0, 0 };
+  printf("GD ERROR %d\n", e);
   if(!serverport_add_extra(s->port, extra, err, 17))
     return -4;
   return -2;
@@ -89,11 +90,13 @@ static bool write_data(server s, struct extra_response *extra,
 static int32_t select_binary(server s, clientcontext client, uint32_t id)
 {
   int32_t r;
+  printf("Selecting iso %d...", id);
   datasource ds = jukebox_get_datasource(s->jbox, id);
   if (!clientcontext_set_datasource(client, ds) ||
       ds == NULL)
     return -2;
   r = datasource_get_1st_read_size(ds);
+  printf("1st_read.bin found\n");
   return (r<0? -2 : r);
 }
 
@@ -150,10 +153,16 @@ static int32_t download(server s, clientcontext client,
   return low_download(s, client, extra, addr, cnt);
 }
 
+/*
+ * Data is read starting from sec in phase size chunks.
+ * Each phase should be half a sector, i.e. 1024 bytes.
+ * We read cnt sectors or 2*cnt phases.
+ */
 static int32_t read_data(server s, clientcontext client,
 			 struct extra_response *extra, uint16_t phase,
 			 uint32_t sec, int32_t cnt, uint32_t addr)
 {
+  //printf("Request read phase %d, sector %d, count %d, addr %x\n", phase, sec, cnt, addr);
   uint8_t buf[2048];
   if (client->dsource == NULL) {
     msglog_error(s->logger, "Read request without a datasource");
@@ -221,24 +230,31 @@ static int32_t handle_packet(void *ctx, clientcontext client, const int32_t *pkt
       switch(cmd) {
       case 16: /* cpu read */
       case 17: /* dma read */
+	if (client->dsource == NULL) select_binary(s, client, 0);
 	return read_data(s, client, extra, (uint16_t)(pkt[0]>>16),
 			 (cnt > 1? (uint32_t)pkt[1] : 0),
 			 (cnt > 2? pkt[2] : 0),
 			 (cnt > 3? (uint32_t)pkt[3] : 0));
 
       case 19: /* read toc */
+	if (client->dsource == NULL) select_binary(s, client, 0);
+	printf("Read TOC requested\n");
 	return read_toc(s, client, extra,
 			(cnt > 1? (uint32_t)pkt[1] : 0),
 			(cnt > 2? (uint32_t)pkt[2] : 0));
 
       case 24: /* init drive */
+	if (client->dsource == NULL) select_binary(s, client, 0);
+	printf("Drive init requested\n");
 	return 0;
 
       case 40: /* get driver version */
+	if (client->dsource == NULL) select_binary(s, client, 0);
+	printf("Driver version requested\n");
 	return get_driver_version(s, extra, (cnt > 1? (uint32_t)pkt[1] : 0));
 
       default:
-	return gderror(s, extra, 32);
+	return gderror(s, extra, cmd);
       }
     } else if(cmd >= 990) {
       /* monitor command */
@@ -258,6 +274,7 @@ static int32_t handle_packet(void *ctx, clientcontext client, const int32_t *pkt
       }
     } else if(cmd >= 800 && cmd < 816) {
       /* unimplemented syscall */
+      printf("Unimplemented syscall %d\n", cmd);
       return -2;
     } else if(cmd >= 500 && cmd < 700) {
       /* status feedback */
@@ -295,11 +312,6 @@ server server_new(msglogger logger, jukebox jbox)
   } else
     msglog_oomerror(logger);
   return NULL;
-}
-
-void server_run_once(server s)
-{
-  serverport_run_once(s->port);
 }
 
 void server_run(server s)
