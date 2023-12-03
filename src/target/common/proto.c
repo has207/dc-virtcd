@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "proto.h"
 #include "util.h"
 

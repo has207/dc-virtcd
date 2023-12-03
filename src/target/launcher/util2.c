@@ -2,19 +2,12 @@
 #include <stdint.h>
 
 #include "video.h"
-#include "util.h"
-#include "util2.h"
 
 /* Dummy stub to make libgcc happy... */
 void atexit() { }
 
 /* Expect to find root directory within this many sectors from the start */
 #define ROOT_DIRECTORY_HORIZON 500
-
-struct isofs_s {
-  unsigned char *data;
-  uint32_t root_lba, root_length;
-};
 
 static int do_plot_string(int x, int y, char *p, unsigned short col)
 {
@@ -136,110 +129,3 @@ void printf(char *fmt, ...)
   va_end(va);
 }
 
-int strlen(const char *str) {
-    const char *s;
-    for (s = str; *s; ++s);
-    return (s - str);
-}
-
-char to_upper(char ch) {
-    if (ch >= 'a' && ch <= 'z') {
-        return ch - 'a' + 'A';
-    }
-    return ch;
-}
-
-static int ntohlp(const unsigned char *ptr)
-{
-  return (ptr[0]<<24)|(ptr[1]<<16)|(ptr[2]<<8)|ptr[3];
-}
-
-static int fncompare(const char *fn1, int fn1len, const char *fn2, int fn2len)
-{
-  while(fn2len--)
-    if(!fn1len--)
-      return *fn2 == ';';
-    else if(to_upper((unsigned char)*fn1++) != to_upper((unsigned char)*fn2++))
-      return 0;
-  return fn1len == 0;
-}
-
-static int isofs_find_root_directory(isofs iso)
-{
-  uint32_t sec;
-  unsigned char *buf;
-  for (sec = 16; sec < ROOT_DIRECTORY_HORIZON; sec++) {
-    buf = iso->data+sec;
-    if (!memcmp(buf, "\001CD001", 6))
-      break;
-    else if(!memcmp(buf, "\377CD001", 6))
-      return 0;
-  }
-  if (sec >= ROOT_DIRECTORY_HORIZON) {
-    printf("Unabled to find root sector\n");
-    return 0;
-  }
-  printf("Found PVD at LBA %d", sec);
-  iso->root_lba = ntohlp(buf+156+6)+150;
-  iso->root_length = ntohlp(buf+156+14);
-  printf("Root directory is at LBA %d, length %d bytes",
-	       iso->root_lba, iso->root_length);
-  return 1;
-}
-
-static int isofs_find_entry(isofs iso, const char *entryname,
-			     uint32_t *sector, uint32_t *length, int enlen,
-			     uint32_t dirsec, uint32_t dirlen, int dirflag)
-{
-  uint32_t len;
-  unsigned char *buf;
-  const unsigned char *p;
-  dirflag = (dirflag? 2 : 0);
-  while(dirlen > 0) {
-    buf = iso->data + dirsec;
-    if (dirlen > 2048) {
-      len = 2048;
-      dirlen -= 2048;
-      dirsec++;
-    } else {
-      len = dirlen;
-      dirlen = 0;
-    }
-    for (p=buf; len>0; ) {
-      if(!*p || *p>len)
-	break;
-      if (*p>32 && *p>32+p[32])
-	if ((p[25]&2) == dirflag &&
-	    fncompare(entryname, enlen, (const char *)(p+33), p[32])) {
-	  if (sector)
-	    *sector = ntohlp(p+6)+150;
-	  if (length)
-	    *length = ntohlp(p+14);
-	  return 1;
-	}
-      len -= *p;
-      p += *p;
-    }
-  }
-  return 0;
-}
-
-int isofs_find_file(isofs iso, const char *filename,
-		     uint32_t *sector, uint32_t *length)
-{
-  return isofs_find_entry(iso, filename, sector, length, strlen(filename),
-			  iso->root_lba, iso->root_length, 0);
-}
-
-int isofs_init(isofs iso, unsigned char *data)
-{
-  if (iso) {
-    iso->data = data;
-    if (isofs_find_root_directory(iso)) {
-      return 1;
-    } else
-      printf("No PVD found\n");
-  } else
-    printf("Invalid isofs\n");
-  return 0;
-}

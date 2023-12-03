@@ -99,7 +99,7 @@ jtable:
 	.long	_unimpl_syscall
 	.long	_unimpl_syscall
 	.long	_unimpl_syscall
-	.long	_unimpl_syscall	! 8
+	.long	_gdrom_abort	! 8
 	.long	_gdrom_reset
 	.long	_gdrom_sector_mode
 	.long	_unimpl_syscall
