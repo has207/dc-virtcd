@@ -125,6 +125,15 @@ void main()
   setup_video();
   setup_network();
 
+  // which iso to load from the server
+  // default to 0 to take the first one
+  int disc_id = 0;
+  int sz;
+  sz = wait_command_packet(send_command_packet(998, &disc_id, 1));
+  if(sz < IPBIN_SIZE || sz > MAX_BINARY) {
+    printf("FAILED!");
+  }
+
   printf("Patching syscalls at %x with %d bytes\n", SUBSTART, subcode_end - subcode);
   install_patch(SUBSTART);
 
@@ -160,7 +169,7 @@ void main()
       buf += (r * bufsize);
       if (i++ % 15 == 0)
         printf(".");
-      if (i % (15 * 80))
+      if (i % (15 * 50) == 0)
         printf("\n");
     }
     printf("\n");
@@ -168,7 +177,9 @@ void main()
 
   //ether_teardown();
   // Start in ip.bin
+  printf("Launching IP.BIN bootloader\n");
   launch(0x8c00B800);
   // Start in 1st_read.bin
+  // printf("Launching %s\n", bootname);
   //launch(0x8c010000);
 }
