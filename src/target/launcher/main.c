@@ -163,14 +163,17 @@ void main()
       if (i % (15 * 50) == 0)
         printf("\n");
     }
-    printf("\n");
+    printf("OK\n");
   }
 
-  //ether_teardown();
-  // Start in ip.bin
-  printf("Launching IP.BIN bootloader\n");
-  launch(0x8c00B800);
-  // Start in 1st_read.bin
-  // printf("Launching %s\n", bootname);
-  //launch(0x8c010000);
+#if 0
+  printf("Launching IP.BIN bootstrap 1\n");
+  launch(0x8c00b800);
+#elif 1
+  printf("Launching IP.BIN bootstrap 2\n");
+  launch(0x8c00e000);
+#else
+  printf("Launching %s\n", bootname);
+  launch(0x8c010000);
+#endif
 }
