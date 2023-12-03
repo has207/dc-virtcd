@@ -18,7 +18,7 @@ Features
 --------
 
 * Works with any software using Gdc system calls to read the disc
-* Supports ISO and NRG images
+* Supports ISO only for now
 
 Misfeatures
 -----------
@@ -29,8 +29,8 @@ Misfeatures
 Bulding
 -------
 
-(separately in host/ and target/)
-autoconf && autoupdate && ./configure && make
+* (host) autoconf && autoupdate && ./configure && make
+* (target) make
 
 IMPORTANT: Adjust DREAMCAST_IP and PC_IP in target/launcher/main.c before compiling.
 Original version of this code attempted to use network settings in system flash on
@@ -51,5 +51,5 @@ It will wait for connections from DC so you can leave this running.
 
 Next start ./target/launcher/virtcd.elf on the Dreamcast (using dcload-ip is fine).
 
-If host code is running when you load the elf on the DC the  download will start
+If host code is running when you load the elf on the DC the download will start
 and you should load into the game.
